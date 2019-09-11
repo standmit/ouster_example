@@ -58,13 +58,12 @@ int main(int argc, char** argv) {
 
     auto batch_and_publish = OS1::batch_to_iter_with_packet<CloudOS1::iterator>(
         xyz_lut, W, H, {}, &PointOS1::make, publish_raw_points,
-		[&](CloudOS1::iterator it, uint64_t packet_ts) mutable {
-    		CloudOS1 element;
-    		element.push_back(*it);
-    		lidar_raw_pub.publish( ouster_ros::OS1::cloud_to_cloud_msg(element, std::chrono::nanoseconds{packet_ts}, lidar_frame) );
-    	},
-        [&](uint64_t scan_ts) mutable
-		{
+	[&](CloudOS1::iterator packet_it, uint64_t packet_ts) mutable {
+	    CloudOS1 element;
+	    std::copy(packet_it, cloud.end(), std::inserter(element.points, element.points.begin()));
+	    lidar_raw_pub.publish( ouster_ros::OS1::cloud_to_cloud_msg(element, std::chrono::nanoseconds{packet_ts}, lidar_frame) );
+	}, [&](uint64_t scan_ts) mutable
+	{
             msg = ouster_ros::OS1::cloud_to_cloud_msg(
                 cloud, std::chrono::nanoseconds{scan_ts}, lidar_frame);
             lidar_pub.publish(msg);

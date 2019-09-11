@@ -152,6 +152,9 @@ std::function<void(const uint8_t*, iterator_type it)> batch_to_iter_with_packet(
     return [=](const uint8_t* packet_buf, iterator_type it) mutable {
     	const uint8_t* col_buf = OS1::nth_col(0, packet_buf);
     	const uint64_t packet_ts = OS1::col_timestamp(col_buf);
+        // index of the first point in current packet
+        int idx;
+
 
         for (int icol = 0; icol < OS1::columns_per_buffer; icol++) {
             const uint8_t* col_buf = OS1::nth_col(icol, packet_buf);
@@ -183,8 +186,7 @@ std::function<void(const uint8_t*, iterator_type it)> batch_to_iter_with_packet(
                 next_m_id = m_id + 1;
             }
 
-            // index of the first point in current packet
-            const int idx = H * m_id;
+            idx = H * m_id;
 
             for (uint8_t ipx = 0; ipx < H; ipx++) {
                 const uint8_t* px_buf = OS1::nth_px(ipx, col_buf);
@@ -201,7 +203,7 @@ std::function<void(const uint8_t*, iterator_type it)> batch_to_iter_with_packet(
             }
         }
         if (pub_raw_points){
-            z(it, packet_ts);
+            z(it+idx, packet_ts);
         }
 
     };
