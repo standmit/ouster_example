@@ -6,6 +6,7 @@
 #pragma once
 
 #include <geometry_msgs/TransformStamped.h>
+#include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -19,7 +20,7 @@
 namespace ouster_ros {
 namespace OS1 {
 
-using CloudOS1 = pcl::PointCloud<PointOS1>;
+using CloudOS1 = pcl::PointCloud<PointOS1base>;
 using ns = std::chrono::nanoseconds;
 
 /**
@@ -56,8 +57,17 @@ sensor_msgs::Imu packet_to_imu_msg(const PacketMsg& pm,
  * @param frame the frame to set in the resulting ROS message
  * @return a ROS message containing the point cloud
  */
-sensor_msgs::PointCloud2 cloud_to_cloud_msg(const CloudOS1& cloud, ns timestamp,
-                                            const std::string& frame);
+template <class T>
+sensor_msgs::PointCloud2 cloud_to_cloud_msg(const pcl::PointCloud<T>& cloud, ns timestamp,
+                                            const std::string& frame) {
+    sensor_msgs::PointCloud2 msg{};
+    pcl::toROSMsg(cloud, msg);
+    msg.header.frame_id = frame;
+    msg.header.stamp.fromNSec(timestamp.count());
+    return msg;
+}
+
+
 
 /**
  * Convert transformation matrix return by sensor to ROS transform

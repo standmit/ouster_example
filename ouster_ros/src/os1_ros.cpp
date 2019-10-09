@@ -59,14 +59,14 @@ sensor_msgs::Imu packet_to_imu_msg(const PacketMsg& p,
     return m;
 }
 
-sensor_msgs::PointCloud2 cloud_to_cloud_msg(const CloudOS1& cloud, ns timestamp,
-                                            const std::string& frame) {
-    sensor_msgs::PointCloud2 msg{};
-    pcl::toROSMsg(cloud, msg);
-    msg.header.frame_id = frame;
-    msg.header.stamp.fromNSec(timestamp.count());
-    return msg;
-}
+//sensor_msgs::PointCloud2 cloud_to_cloud_msg(const CloudOS1& cloud, ns timestamp,
+//                                            const std::string& frame) {
+//    sensor_msgs::PointCloud2 msg{};
+//    pcl::toROSMsg(cloud, msg);
+//    msg.header.frame_id = frame;
+//    msg.header.stamp.fromNSec(timestamp.count());
+//    return msg;
+//}
 
 geometry_msgs::TransformStamped transform_to_tf_msg(
     const std::vector<double>& mat, const std::string& frame,
